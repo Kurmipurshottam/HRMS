@@ -764,6 +764,9 @@
 					if (firstName && lastName) {
 						document.getElementById('employee_id').value = generateEmployeeId();
 						document.getElementById('username').value = generateUsername(firstName, lastName);
+					} else {
+						document.getElementById('employee_id').value = '';
+						document.getElementById('username').value = '';
 					}
 				}
 		
