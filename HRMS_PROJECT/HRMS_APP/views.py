@@ -4,7 +4,7 @@ import sweetify
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.utils.dateparse import parse_date
+from datetime import datetime
 import random
 
 # Create your views here.
@@ -121,18 +121,20 @@ def email_reset(request):
           return render(request,"email_reset.html") 
 
 def employees_list(request):
-    return render(request,"employees-list.html")
+    employee=Employees.objects.all()
+    print(employee)
+    return render(request,"employees-list.html",{'employee':employee})
 
 def add_employee(request):
     if request.POST:
-        if request.POST['password']==request.POST['cpassword']:
+        if request.POST['password']==request.POST['password2']:
             employee = Employees.objects.create(
                 first_name = request.POST['first_name'],
                 last_name = request.POST['last_name'],
                 username = request.POST['username'],
                 email = request.POST['email'],
                 password = request.POST['password'],
-                joining_date = parse_date(request.POST['joining_date']),
+                joining_date = datetime.strptime(request.POST['joining_date'], '%d/%m/%Y').strftime('%Y-%m-%d'),
                 employee_id = request.POST['employee_id'],
                 phone = request.POST['phone'],
                 company = request.POST['company'],
@@ -140,9 +142,9 @@ def add_employee(request):
                 designation = request.POST['designation'],
             )
             sweetify.success(request,"Employee Add Successfully..")
-            return render(request,"employees_list.html")
+            return render(request,"employees-list.html")
         else:
             sweetify.warning(request,"password and Conifrm pass can not match")
-            return render(request,"employees_list.html")
+            return render(request,"employees-list.html")
     else:
-        return render(request,"employees_list.html")
+        return render(request,"employees-list.html")
