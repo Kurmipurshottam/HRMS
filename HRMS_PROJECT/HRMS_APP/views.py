@@ -51,7 +51,9 @@ def login(request):
         return render(request,"login.html")
     
 def logout(request):
-    pass
+    del request.session['email']
+    sweetify.success(request,"Logout Successfully")
+    return render(request,"login.html")
 
 def forgot_password(request):
     if request.POST:
@@ -115,9 +117,15 @@ def email_reset(request):
                 return render(request,"email_reset.html")        
      else:
           return render(request,"email_reset.html") 
-     
-def employees(request):
-    return render(request,"employees.html")
 
 def employees_list(request):
     return render(request,"employees-list.html")
+
+def add_employee(request):
+    if request.POST:
+        if request.POST['password']==request.POST['password2']:
+            employee=Employees.objects.create(
+                
+            )
+    else:
+        return render(request,"employees-list.html")

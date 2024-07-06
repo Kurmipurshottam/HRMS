@@ -27,6 +27,6 @@ urlpatterns = [
     path('email_reset', views.email_reset, name='email_reset'),
     path('index', views.index, name='index'),
     path('logout', views.logout, name='logout'),
-    path('employees', views.employees, name='employees'),
+    path('add_employee', views.add_employee, name='add_employee'),
     path('employees_list', views.employees_list, name='employees_list'),
 ]
