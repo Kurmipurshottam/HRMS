@@ -320,19 +320,19 @@
 										<div class="col-sm-6">
 											<div class="form-group">
 												<label class="col-form-label">First Name <span class="text-danger">*</span></label>
-												<input class="form-control" type="text" name="first_name">
+												<input class="form-control" type="text" name="first_name" id="first_name">
 											</div>
 										</div>
 										<div class="col-sm-6">
 											<div class="form-group">
 												<label class="col-form-label">Last Name</label>
-												<input class="form-control" type="text" name="last_name">
+												<input class="form-control" type="text" name="last_name" id="last_name">
 											</div>
 										</div>
 										<div class="col-sm-6">
 											<div class="form-group">
 												<label class="col-form-label">Username <span class="text-danger">*</span></label>
-												<input class="form-control" type="text" name="username">
+												<input class="form-control" type="text" name="username" id="username" readonly>
 											</div>
 										</div>
 										<div class="col-sm-6">
@@ -415,7 +415,6 @@
 						</div>
 					</div>
 				</div>
-				
 				<!-- /Add Employee Modal -->
 				
 				<!-- Edit Employee Modal -->
@@ -743,17 +742,39 @@
 			
         </div>
 		<!-- /Main Wrapper -->
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+		<!--script-->
 		<script>
 			document.addEventListener('DOMContentLoaded', function() {
+				function generateEmployeeId() {
+					return 'EMP' + Math.floor(Math.random() * 10000);
+				}
+		
+				function generateUsername(firstName, lastName) {
+					const firstPart = firstName.slice(0, 3).toUpperCase();
+					const lastPart = lastName.slice(-3).toUpperCase();
+					const randomNum = Math.floor(Math.random() * 100);
+					return firstPart + lastPart + randomNum;
+				}
+		
+				function updateFields() {
+					const firstName = document.getElementById('first_name').value;
+					const lastName = document.getElementById('last_name').value;
+		
+					if (firstName && lastName) {
+						document.getElementById('employee_id').value = generateEmployeeId();
+						document.getElementById('username').value = generateUsername(firstName, lastName);
+					}
+				}
+		
+				document.getElementById('first_name').addEventListener('input', updateFields);
+				document.getElementById('last_name').addEventListener('input', updateFields);
+		
 				$('#add_employee').on('show.bs.modal', function() {
-					// Generate a unique employee ID (e.g., a random number or use a specific logic)
-					var employeeId = 'EMP' + Math.floor(Math.random() * 10000); // Example logic to generate ID
-					
-					// Set the generated ID to the input field
-					document.getElementById('employee_id').value = employeeId;
+					document.getElementById('employee_id').value = '';
+					document.getElementById('username').value = '';
 				});
 			});
 		</script>
+		<!--/script-->
 {% endblock  %}
