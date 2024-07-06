@@ -49,6 +49,9 @@ def login(request):
             return render(request,"login.html")
     else:
         return render(request,"login.html")
+    
+def logout(request):
+    pass
 
 def forgot_password(request):
     if request.POST:
@@ -112,3 +115,9 @@ def email_reset(request):
                 return render(request,"email_reset.html")        
      else:
           return render(request,"email_reset.html") 
+     
+def employees(request):
+    return render(request,"employees.html")
+
+def employees_list(request):
+    return render(request,"employees-list.html")
