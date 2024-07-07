@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from .models import *
 import sweetify
 from django.core.mail import send_mail
@@ -147,3 +147,12 @@ def employees_list(request):
                 return render(request,"employees-list.html",{'employee':employee})
         else:
             return render(request,"employees-list.html",{'employee':employee})
+
+def delete_employee(request,id):
+    employee=Employees.objects.all()
+    print(employee)
+    employees = get_object_or_404(Employees, id=id)
+    print(employees)
+    employees.delete()
+    sweetify.success(request,"employee deleted successfully")
+    return render(request,"employees-list.html",{'employee':employee})
