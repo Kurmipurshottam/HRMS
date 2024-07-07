@@ -6,8 +6,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from datetime import datetime
 import random
-from django.http import JsonResponse
-from django.contrib import messages
+from django.db.models import Q
 
 # Create your views here.
 
@@ -147,6 +146,29 @@ def employees_list(request):
                 return render(request,"employees-list.html",{'employee':employee})
         else:
             return render(request,"employees-list.html",{'employee':employee})
+        
+def employees_serch(request):
+    employee_id = request.GET.get('employee_id')
+    employee_name = request.GET.get('employee_name')
+    designation = request.GET.get('designation')
+    print(employee_name)
+    employees = Employees.objects.all()
+
+    if employee_id:
+        employee = employees.filter(employee_id__icontains=employee_id)
+    
+    if employee_name:
+        employee = employees.filter(
+            Q(first_name__icontains=employee_name) | Q(last_name__icontains=employee_name)
+        )
+
+    if designation:
+        employee = employees.filter(designation__icontains=designation)
+    
+    context = {
+        'employee': employee,
+    }
+    return render(request, 'employees-list.html', context)
 
 def delete_employee(request,id):
     employee=Employees.objects.all()
