@@ -72,30 +72,33 @@
 										</tr>
 									</thead>
 									<tbody>
-										{% for employee in employee %}
-										<tr>
-											<td>
-												<h2 class="table-avatar">
-													<a href="profile.html" class="avatar"><img alt="" src="{% static 'assets\img\profiles\avatar-02.jpg'%}"></a>
-													<a href="profile.html">{{employee.first_name}}&nbsp;{{employee.last_name}}<span>{{employee.designation}}</span></a>
-												</h2>
-											</td>
-											<td>{{employee.employee_id}}</td>
-											<td><a href="mailto:{{ employee.email }}">{{ employee.email }}</a></td>											
-											<td>{{employee.phone}}</td>
-											<td>{{employee.joining_date}}</td>
-											<td>{{employee.department}}</td>
-											<td class="text-right">
-												<div class="dropdown dropdown-action">
-													<a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
-													<div class="dropdown-menu dropdown-menu-right">
-														<a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_employee"><i class="fa fa-pencil m-r-5"></i> Edit</a>
-														<a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_employee"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
-													</div>
-												</div>
-											</td>
-										</tr>
-										{% endfor %}
+										{% if employee %}
+											{% for emp in employee %}
+												<tr>
+													<td>
+														<h2 class="table-avatar">
+															<a href="profile.html" class="avatar"><img alt="" src="{% static 'assets/img/profiles/avatar-02.jpg' %}"></a>
+															<a href="profile.html">{{ emp.first_name }} {{ emp.last_name }}<span>{{ emp.designation }}</span></a>
+														</h2>
+													</td>
+													<td>{{ emp.employee_id }}</td>
+													<td><a href="mailto:{{ emp.email }}">{{ emp.email }}</a></td>
+													<td>{{ emp.phone }}</td>
+													<td>{{ emp.joining_date }}</td>
+													<td>{{ emp.department }}</td>
+													<td class="text-right">
+														<div class="dropdown dropdown-action">
+															<a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
+															<div class="dropdown-menu dropdown-menu-right">
+																<a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_employee"><i class="fa fa-pencil m-r-5"></i> Edit</a>
+																<a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_employee"><i class="fa fa-trash-o m-r-5"></i> Delete</a>
+															</div>
+														</div>
+													</td>
+												</tr>
+											{% endfor %}
+										{% endif %}
+
 									</tbody>
 								</table>
 							</div>
@@ -115,7 +118,7 @@
 								</button>
 							</div>
 							<div class="modal-body">
-								<form method="post" action="{% url 'add_employee' %}">
+								<form method="post" action="{% url 'employees_list' %}">
 									{% csrf_token %}
 									<div class="row">
 										<div class="col-sm-6">
