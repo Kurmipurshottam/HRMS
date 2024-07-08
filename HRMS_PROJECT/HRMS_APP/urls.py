@@ -27,7 +27,20 @@ urlpatterns = [
     path('email_reset', views.email_reset, name='email_reset'),
     path('index', views.index, name='index'),
     path('logout', views.logout, name='logout'),
+    
+    path('profile', views.profile, name='profile'),
+
     path('employees_list', views.employees_list, name='employees_list'),
     path('employees_serch', views.employees_serch, name='employees_serch'),
     path('delete_employee/ <int:id>/', views.delete_employee, name='delete_employee'),
+    path('update_employee/ <int:id>/', views.update_employee, name='update_employee'),
+
+    path('departments', views.departments, name='departments'),
+    path('departments_delete/ <int:id>/', views.departments_delete, name='departments_delete'),
+    path('departments_update/ <int:id>', views.departments_update, name='departments_update'),
+
+    path('designations', views.designations, name='designations'),
+    path('designations_delete/ <int:id>/', views.designations_delete, name='designations_delete'),
+    path('designations_update/ <int:id>', views.designations_update, name='designations_update'),
+
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render,get_object_or_404,redirect
 from .models import *
 import sweetify
 from django.core.mail import send_mail
@@ -57,6 +57,9 @@ def logout(request):
     del request.session['email']
     sweetify.success(request,"Logout Successfully")
     return render(request,"login.html")
+
+def profile(request):
+    return render(request,"profile.html")
 
 def forgot_password(request):
     if request.POST:
@@ -122,59 +125,156 @@ def email_reset(request):
           return render(request,"email_reset.html") 
 
 def employees_list(request):
-        employee=Employees.objects.all()
-        print(employee)
-        if request.POST:
-            if request.POST['password']==request.POST['password2']:
-                employees = Employees.objects.create(
-                    first_name = request.POST['first_name'],
-                    last_name = request.POST['last_name'],
-                    username = request.POST['username'],
-                    email = request.POST['email'],
-                    password = request.POST['password'],
-                    joining_date = datetime.strptime(request.POST['joining_date'], '%d/%m/%Y').strftime('%Y-%m-%d'),
-                    employee_id = request.POST['employee_id'],
-                    phone = request.POST['phone'],
-                    company = request.POST['company'],
-                    department = request.POST['department'],
-                    designation = request.POST['designation'],
-                )
-                sweetify.success(request,"Employee Add Successfully..")
-                return render(request,"employees-list.html",{'employee':employee})
-            else:
-                sweetify.warning(request,"password and Conifrm pass can not match")
-                return render(request,"employees-list.html",{'employee':employee})
+    employees = Employees.objects.all()
+    departments = Department.objects.all()
+    designations = Designation.objects.all()
+    
+    if request.method == "POST":
+        if request.POST['password'] == request.POST['password2']:
+            Employees.objects.create(
+                first_name=request.POST['first_name'],
+                last_name=request.POST['last_name'],
+                username=request.POST['username'],
+                email=request.POST['email'],
+                password=request.POST['password'],
+                joining_date=datetime.strptime(request.POST['joining_date'], '%d/%m/%Y').strftime('%Y-%m-%d'),
+                employee_id=request.POST['employee_id'],
+                phone=request.POST['phone'],
+                company=request.POST['company'],
+                department=Department.objects.get(id=request.POST['department']),
+                designation=Designation.objects.get(id=request.POST['designation']),
+            )
+            sweetify.success(request, "Employee Add Successfully..")
+            return render(request, 'employees-list.html', {'employees': employees, 'departments': departments, 'designations': designations})
         else:
-            return render(request,"employees-list.html",{'employee':employee})
+            sweetify.warning(request, "Password and Confirm password do not match")
+            return render(request, 'employees-list.html', {'employees': employees, 'departments': departments, 'designations': designations})
+    else:
+        return render(request, 'employees-list.html', {'employees': employees, 'departments': departments, 'designations': designations})
         
 def employees_serch(request):
     employee_id = request.GET.get('employee_id')
     employee_name = request.GET.get('employee_name')
-    designation = request.GET.get('designation')
-    print(employee_name)
-    employees = Employees.objects.all()
+    designation_id = request.GET.get('designation')
+    print("================================",designation_id)
+    employee = Employees.objects.all()
+    departments = Department.objects.all()
+    designations = Designation.objects.all()
 
     if employee_id:
-        employee = employees.filter(employee_id__icontains=employee_id)
+        employees = employee.filter(employee_id__icontains=employee_id)
     
     if employee_name:
-        employee = employees.filter(
+        employees = employee.filter(
             Q(first_name__icontains=employee_name) | Q(last_name__icontains=employee_name)
         )
 
-    if designation:
-        employee = employees.filter(designation__icontains=designation)
-    
+    if designation_id:
+        employees = employee.filter(designation_id=designation_id)
+
     context = {
-        'employee': employee,
+        'employees': employees,
+        'departments': departments,
+        'designations': designations,
     }
-    return render(request, 'employees-list.html', context)
+    return render(request, 'employees-list.html',context)
+
+def update_employee(request,id):
+    employees = Employees.objects.all()
+    departments = Department.objects.all()
+    designations = Designation.objects.all()
+    employee = get_object_or_404(Employees, pk=id)
+    if request.method == 'POST':
+        employee.first_name = request.POST.get('first_name')
+        employee.last_name = request.POST.get('last_name')
+        employee.email = request.POST.get('email')
+        department_id = request.POST.get('department')
+        designation_id = request.POST.get('designation')
+        employee.department = Department.objects.get(id=department_id)
+        employee.designation = Designation.objects.get(id=designation_id)
+        employee.save()
+        sweetify.success(request, "Employee Updated Successfully")
+        return render(request, 'employees-list.html', {'employees': employees, 'departments': departments, 'designations': designations})
+    return render(request, 'employees-list.html', {'employees': employees, 'departments': departments, 'designations': designations})
 
 def delete_employee(request,id):
-    employee=Employees.objects.all()
-    print(employee)
-    employees = get_object_or_404(Employees, id=id)
+    employees=Employees.objects.all()
     print(employees)
-    employees.delete()
+    employee = get_object_or_404(Employees, id=id)
+    print(employee)
+    employee.delete()
     sweetify.success(request,"employee deleted successfully")
-    return render(request,"employees-list.html",{'employee':employee})
+    return render(request,"employees-list.html",{'employees':employees})
+
+def departments(request):
+    department = Department.objects.all()
+    if request.POST:
+        Department.objects.create(
+            department = request.POST['department']
+        )
+        sweetify.success(request,"Departments Add Successfully..")
+        return render(request,"departments.html",{'department':department})
+    else:
+        return render(request,"departments.html",{'department':department})
+    
+
+def departments_delete(request,id):
+    department = Department.objects.all()
+    departments = get_object_or_404(Department, id=id)
+    departments.delete()
+    sweetify.success(request,"Departments Delete Successfully..")
+    return render(request,"departments.html",{'department':department})  
+    
+
+def departments_update(request,id):
+    departments = get_object_or_404(Department, id=id)
+    if request.method == 'POST':
+        department_name = request.POST['department']
+        departments.department = department_name
+        departments.save()
+        department = Department.objects.all()
+        sweetify.success(request, "Department updated successfully.")
+        return render(request, 'departments.html',{'department':department}) 
+    return render(request, 'departments.html',{'department':department}) 
+
+def designations(request):
+    designation = Designation.objects.all()
+    departments = Department.objects.all()
+    
+    if request.method == "POST":
+        designations = request.POST.get('designation')  
+        department_id = request.POST.get('department')  
+        
+        department = Department.objects.get(id=department_id)
+        
+        Designation.objects.create(
+            designation=designations,
+            department=department
+        )       
+        sweetify.success(request, "Designation Added Successfully..")
+        return render(request, "designations.html", {'designation': designation, 'departments': departments}) 
+    return render(request, "designations.html", {'designation': designation, 'departments': departments})
+
+def designations_update(request, id):
+    designations = get_object_or_404(Designation, pk=id)
+    if request.method == 'POST':
+        designation = request.POST.get('designation')
+        department_id = request.POST.get('department')
+        department = Department.objects.get(id=department_id)
+        
+        designations.designation = designation
+        designations.department = department
+        designations.save()
+        designation = Designation.objects.all()
+        sweetify.success(request, "Designation updated successfully.")
+        return render(request, 'designations.html',{'designation':designation})
+    return render(request, 'designations.html',{'designation':designation})
+
+    
+def designations_delete(request, id):
+    designation = Designation.objects.all()
+    designations = get_object_or_404(Designation, id=id)
+    designations.delete()
+    
+    sweetify.success(request, "Designation deleted successfully.")
+    return render(request, 'designations.html',{'designation':designation})
