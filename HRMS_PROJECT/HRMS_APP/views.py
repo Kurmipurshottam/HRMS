@@ -7,6 +7,8 @@ from django.utils.html import strip_tags
 from datetime import datetime
 import random
 from django.db.models import Q
+from django.contrib.auth import authenticate
+from django.contrib.auth import logout as auth_logout
 
 # Create your views here.
 
@@ -35,26 +37,42 @@ def register(request):
     
 def login(request):
     if request.POST:
+        print("----------------------")
         try:
-            user=User.objects.get(email=request.POST['email'])
-            print("================",user.email)
-            if user.password==request.POST['password']:
-                print("========>>>>>>>")
-                request.session['email']=user.email
-                print("--------------------------")
-                sweetify.success(request,"Login Successfully")
-                return render(request,"index.html")
+            print("00000000000000000000000000")
+            emp=Employees.objects.get(email=request.POST['email'])
+            print("=============")   
+            if emp.password==request.POST['password']:
+                    print("========>>>>>>>")
+                    request.session['email']=emp.email
+                    print("--------------------------")
+                    sweetify.success(request,"Login Successfully")
+                    return render(request,"profile.html")
             else:
-                sweetify.error(request,"Password Does Not Match")
-                return render(request,"login.html")
+                    sweetify.error(request,"Password Does Not Match")
+                    return render(request,"login.html")
         except:
-            sweetify.error(request,"Email Does Not Exists??")
-            return render(request,"login.html")
+            if request.method == 'POST':
+                email = request.POST['email']
+                password = request.POST['password']
+                user = authenticate(email=email, password=password)
+                if user is not None:
+                    return redirect('index')  
+                else:
+                    return render(request, 'index.html', {'error': 'Invalid Username and Password'})
+            return render(request, 'index.html')
     else:
-        return render(request,"login.html")
+                return render(request,"login.html")
     
 def logout(request):
-    del request.session['email']
+    try:
+        del request.session['email']
+        sweetify.success(request,"Logout Successfully")
+        return render(request,"login.html")
+    except:
+        pass
+
+    auth_logout(request)
     sweetify.success(request,"Logout Successfully")
     return render(request,"login.html")
 
