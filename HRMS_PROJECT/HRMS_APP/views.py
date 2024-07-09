@@ -7,7 +7,7 @@ from django.utils.html import strip_tags
 from datetime import datetime
 import random
 from django.db.models import Q
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth import logout as auth_logout
 
 # Create your views here.
@@ -36,45 +36,59 @@ def register(request):
         return render(request,"register.html")
     
 def login(request):
-    if request.POST:
-        print("----------------------")
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        print("Received POST request with username:", username)
+        print("Received POST request with password:", password)
+
+        # First try to authenticate with Employees model
         try:
-            print("00000000000000000000000000")
-            emp=Employees.objects.get(email=request.POST['email'])
-            print("=============")   
-            if emp.password==request.POST['password']:
-                    print("========>>>>>>>")
-                    request.session['email']=emp.email
-                    print("--------------------------")
-                    sweetify.success(request,"Login Successfully")
-                    return render(request,"profile.html")
+            emp = Employees.objects.get(username=username)
+            print("Employee found:", emp)
+            if emp.password == password:
+                print("Password matches for employee.")
+                request.session['username'] = emp.username
+                sweetify.success(request, "Login Successfully")
+                return render(request, "profile.html")
             else:
-                    sweetify.error(request,"Password Does Not Match")
-                    return render(request,"login.html")
-        except:
-            if request.method == 'POST':
-                email = request.POST['email']
-                password = request.POST['password']
-                user = authenticate(email=email, password=password)
-                if user is not None:
-                    return redirect('index')  
-                else:
-                    return render(request, 'index.html', {'error': 'Invalid Username and Password'})
-            return render(request, 'index.html')
+                print("Password does not match for employee.")
+                sweetify.error(request, "Password Does Not Match")
+                return render(request, "login.html")
+        except Employees.DoesNotExist:
+            print("Employee does not exist.")
+            sweetify.error(request, "Email Does Not Exist")
+
+        # Fall back to Django's built-in authentication
+        user = authenticate(request, username=username, password=password)
+        print("================>",user)
+        if user is not None:
+            print("User authenticated successfully.")
+            auth_login(request, user) 
+            request.session['username'] = username
+            sweetify.success(request, "Login Successfully")
+            return redirect('index')
+        else:
+            print("Django authentication failed.")
+            sweetify.error(request, "Password Does Not Match")
+            return render(request, 'login.html', {'error': 'Invalid Username and Password'})
     else:
-                return render(request,"login.html")
+        print("Rendering login page.")
+        return render(request, 'login.html')
     
 def logout(request):
     try:
-        del request.session['email']
-        sweetify.success(request,"Logout Successfully")
-        return render(request,"login.html")
-    except:
-        pass
-
+        print("Attempting to delete username from session...")
+        del request.session['username']
+        sweetify.success(request, "Logout Successfully")
+        return render(request, "login.html")
+    except KeyError:
+        print("Username not found in session.")
+    
+    print("Logging out user using Django's auth_logout...")
     auth_logout(request)
-    sweetify.success(request,"Logout Successfully")
-    return render(request,"login.html")
+    sweetify.success(request, "Logout Successfully")
+    return render(request, "login.html")
 
 def profile(request):
     return render(request,"profile.html")
