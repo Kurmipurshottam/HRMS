@@ -25,11 +25,12 @@ urlpatterns = [
     path('forgot_password', views.forgot_password, name='forgot_password'),
     path('email_otp', views.email_otp, name='email_otp'),
     path('email_reset', views.email_reset, name='email_reset'),
-    path('index', views.index, name='index'),
+    path('admin_dashboard', views.admin_dashboard, name='admin_dashboard'),
     path('logout', views.logout, name='logout'),
     
     path('profile', views.profile, name='profile'),
 
+    path('employee_dashboard', views.employee_dashboard, name='employee_dashboard'),
     path('employees_list', views.employees_list, name='employees_list'),
     path('employees_serch', views.employees_serch, name='employees_serch'),
     path('delete_employee/ <int:id>/', views.delete_employee, name='delete_employee'),

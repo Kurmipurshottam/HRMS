@@ -12,9 +12,6 @@ from django.contrib.auth import logout as auth_logout
 
 # Create your views here.
 
-def index(request):
-    return render(request,"index.html")
-
 def register(request):
     if request.POST:
         try:
@@ -50,7 +47,7 @@ def login(request):
                 print("Password matches for employee.")
                 request.session['username'] = emp.username
                 sweetify.success(request, "Login Successfully")
-                return render(request, "profile.html")
+                return render(request, "employee_dashboard.html")
             else:
                 print("Password does not match for employee.")
                 sweetify.error(request, "Password Does Not Match")
@@ -67,7 +64,7 @@ def login(request):
             auth_login(request, user) 
             request.session['username'] = username
             sweetify.success(request, "Login Successfully")
-            return redirect('index')
+            return redirect('admin_dashboard')
         else:
             print("Django authentication failed.")
             sweetify.error(request, "Password Does Not Match")
@@ -75,23 +72,7 @@ def login(request):
     else:
         print("Rendering login page.")
         return render(request, 'login.html')
-    
-def logout(request):
-    try:
-        print("Attempting to delete username from session...")
-        del request.session['username']
-        sweetify.success(request, "Logout Successfully")
-        return render(request, "login.html")
-    except KeyError:
-        print("Username not found in session.")
-    
-    print("Logging out user using Django's auth_logout...")
-    auth_logout(request)
-    sweetify.success(request, "Logout Successfully")
-    return render(request, "login.html")
 
-def profile(request):
-    return render(request,"profile.html")
 
 def forgot_password(request):
     if request.POST:
@@ -155,6 +136,35 @@ def email_reset(request):
                 return render(request,"email_reset.html")        
      else:
           return render(request,"email_reset.html") 
+
+def logout(request):
+    try:
+        print("Attempting to delete username from session...")
+        del request.session['username']
+        sweetify.success(request, "Logout Successfully")
+        return render(request, "login.html")
+    except KeyError:
+        print("Username not found in session.")
+    
+    print("Logging out user using Django's auth_logout...")
+    auth_logout(request)
+    sweetify.success(request, "Logout Successfully")
+    return render(request, "login.html")
+
+
+def admin_dashboard(request):
+    emp = Employees.objects.count()
+    context={
+        'emp':emp
+    }
+    
+    return render(request,"admin_dashboard.html",context)
+
+def profile(request):
+    return render(request,"profile.html")
+
+def employee_dashboard(reuqest):
+    return render(reuqest,"employee_dashboard.html")
 
 def employees_list(request):
     employees = Employees.objects.all()
