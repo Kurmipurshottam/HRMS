@@ -96,8 +96,8 @@ def profile(request):
 def forgot_password(request):
     if request.POST:
         try:
-            user=User.objects.get(email=request.POST['email'])
-            print("================",user)
+            employees=Employees.objects.get(email=request.POST['email'])
+            print("================",employees)
             email = request.POST['email']
             request.session['email']=email
             print(email)
@@ -140,10 +140,10 @@ def email_otp(request):
 
 def email_reset(request):
      if request.POST:
-            user= User.objects.get(email=request.session['email'])
+            employees= Employees.objects.get(email=request.session['email'])
             if request.POST['npassword']==request.POST['ncpassword']:
-                user.password=request.POST['ncpassword']
-                user.save()
+                employees.password=request.POST['ncpassword']
+                employees.save()
                 msg="password reset successfuly" 
                 sweetify.success(request,msg)
                 del request.session['email']
