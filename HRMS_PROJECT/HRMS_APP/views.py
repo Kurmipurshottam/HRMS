@@ -187,6 +187,9 @@ def employees_list(request):
                 designation=Designation.objects.get(id=request.POST['designation']),
             )
             sweetify.success(request, "Employee Add Successfully..")
+            print(employees)
+            print(departments)
+            print(designations)
             return render(request, 'employees-list.html', {'employees': employees, 'departments': departments, 'designations': designations})
         else:
             sweetify.warning(request, "Password and Confirm password do not match")
@@ -241,12 +244,14 @@ def update_employee(request,id):
 
 def delete_employee(request,id):
     employees=Employees.objects.all()
+    departments = Department.objects.all()
+    designations = Designation.objects.all()
     print(employees)
     employee = get_object_or_404(Employees, id=id)
     print(employee)
     employee.delete()
     sweetify.success(request,"employee deleted successfully")
-    return render(request,"employees-list.html",{'employees':employees})
+    return render(request,"employees-list.html",{'employees': employees, 'departments': departments, 'designations': designations})
 
 def departments(request):
     department = Department.objects.all()
@@ -299,6 +304,7 @@ def designations(request):
 
 def designations_update(request, id):
     designations = get_object_or_404(Designation, pk=id)
+    departments = Department.objects.all()
     if request.method == 'POST':
         designation = request.POST.get('designation')
         department_id = request.POST.get('department')
@@ -309,19 +315,44 @@ def designations_update(request, id):
         designations.save()
         designation = Designation.objects.all()
         sweetify.success(request, "Designation updated successfully.")
-        return render(request, 'designations.html',{'designation':designation})
-    return render(request, 'designations.html',{'designation':designation})
+        return render(request, 'designations.html',{'designation': designation, 'departments': departments})
+    return render(request, 'designations.html',{'designation': designation, 'departments': departments})
 
     
 def designations_delete(request, id):
     designation = Designation.objects.all()
+    departments = Department.objects.all()
     designations = get_object_or_404(Designation, id=id)
     designations.delete()
     
     sweetify.success(request, "Designation deleted successfully.")
-    return render(request, 'designations.html',{'designation':designation})
+    return render(request, 'designations.html',{'designation': designation, 'departments': departments})
 
 def holidays(request):
+    holidays = Holidays.objects.all()
     if request.POST:
-        
-    return render(request,"holidays.html")
+        Holidays.objects.create(
+        holiday_name = request.POST['holidays_name'],
+        holiday_date = datetime.strptime(request.POST['holidays_date'], '%d/%m/%Y').strftime('%Y-%m-%d'),
+        )
+        sweetify.success(request,"Holidays Add Successfully..")
+        return render(request,"Holidays.html",{'holidays':holidays})
+    return render(request,"holidays.html",{'holidays':holidays})
+
+def holidays_delete(request, id):
+    holidays = Holidays.objects.all()
+    holiday = get_object_or_404(Holidays, id=id)
+    holiday.delete() 
+    sweetify.success(request, "Holiday deleted successfully.")
+    return render(request,"Holidays.html",{'holidays':holidays})
+
+def holidays_update(request, id):
+    holiday = get_object_or_404(Holidays, pk=id)
+    if request.method == 'POST':
+        holiday.holiday_name=request.POST['holidays_name'],
+        holiday.holiday_date=request.POST['holidays_date'],
+        holiday.save()
+        holidays = Holidays.objects.all()
+        sweetify.success(request, "Holiday updated successfully.")
+        return render(request, 'holidays.html',{'holidays':holidays})
+    return render(request, 'holidays.html',{'holidays':holidays})
