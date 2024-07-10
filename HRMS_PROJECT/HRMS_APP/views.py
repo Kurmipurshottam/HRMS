@@ -320,3 +320,8 @@ def designations_delete(request, id):
     
     sweetify.success(request, "Designation deleted successfully.")
     return render(request, 'designations.html',{'designation':designation})
+
+def holidays(request):
+    if request.POST:
+        
+    return render(request,"holidays.html")

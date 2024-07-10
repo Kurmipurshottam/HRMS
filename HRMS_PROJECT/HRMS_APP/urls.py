@@ -44,4 +44,8 @@ urlpatterns = [
     path('designations_delete/ <int:id>/', views.designations_delete, name='designations_delete'),
     path('designations_update/ <int:id>', views.designations_update, name='designations_update'),
 
+    path('holidays', views.holidays, name='holidays'),
+
+    
+
 ]
