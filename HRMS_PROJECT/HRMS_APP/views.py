@@ -9,6 +9,7 @@ import random
 from django.db.models import Q
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth import logout as auth_logout
+from datetime import date
 
 # Create your views here.
 
@@ -303,7 +304,7 @@ def designations(request):
     return render(request, "designations.html", {'designation': designation, 'departments': departments})
 
 def designations_update(request, id):
-    designations = get_object_or_404(Designation, pk=id)
+    designations = get_object_or_404(Designation, id=id)
     departments = Department.objects.all()
     if request.method == 'POST':
         designation = request.POST.get('designation')
@@ -347,12 +348,14 @@ def holidays_delete(request, id):
     return render(request,"Holidays.html",{'holidays':holidays})
 
 def holidays_update(request, id):
-    holiday = get_object_or_404(Holidays, pk=id)
+    holiday = get_object_or_404(Holidays, id=id)
+    holidays = Holidays.objects.all()
+    current_date = date.today()
+    
     if request.method == 'POST':
-        holiday.holiday_name=request.POST['holidays_name'],
-        holiday.holiday_date=request.POST['holidays_date'],
+        holiday.holiday_name=request.POST['holidays_name']
+        holiday.holiday_date=datetime.strptime(request.POST['holidays_date'], '%d/%m/%Y').strftime('%Y-%m-%d')
         holiday.save()
-        holidays = Holidays.objects.all()
         sweetify.success(request, "Holiday updated successfully.")
-        return render(request, 'holidays.html',{'holidays':holidays})
-    return render(request, 'holidays.html',{'holidays':holidays})
+        return render(request, 'holidays.html',{'holidays':holidays,'current_date':current_date})
+    return render(request, 'holidays.html',{'holidays':holidays,'current_date':current_date})
