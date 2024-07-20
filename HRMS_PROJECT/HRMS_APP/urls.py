@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import views
+from HRMS_APP.views import *
 
 urlpatterns = [
     # path('', views.home, name='home')
@@ -47,6 +48,9 @@ urlpatterns = [
     path('holidays', views.holidays, name='holidays'),
     path('holidays_delete/ <int:id>/', views.holidays_delete, name='holidays_delete'),
     path('holidays_update/ <int:id>', views.holidays_update, name='holidays_update'),
+
+    path('home', Home.as_view(), name='home')
+
 
     
 

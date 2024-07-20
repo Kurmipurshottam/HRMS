@@ -1,4 +1,4 @@
-from django.shortcuts import render,get_object_or_404,redirect
+from django.shortcuts import render,get_object_or_404,redirect, HttpResponse
 from .models import *
 import sweetify
 from django.core.mail import send_mail
@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth import logout as auth_logout
 from datetime import date
+from django.views import View
 
 # Create your views here.
 
@@ -359,3 +360,10 @@ def holidays_update(request, id):
         sweetify.success(request, "Holiday updated successfully.")
         return render(request, 'holidays.html',{'holidays':holidays,'current_date':current_date})
     return render(request, 'holidays.html',{'holidays':holidays,'current_date':current_date})
+
+
+
+class Home(View):
+    def get (self, request):
+        return HttpResponse("hello smit")
+        
